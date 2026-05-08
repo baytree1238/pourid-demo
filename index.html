@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PourID — Marina Bay Tower</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #0f172a;
+    background: #f8fafc;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; padding: 0; font-size: inherit; color: inherit; }
+  table { border-collapse: collapse; width: 100%; }
+  h1 { font-weight: 700; letter-spacing: -0.02em; margin: 0; }
+
+  .tabular { font-variant-numeric: tabular-nums; }
+  .anim-fade { animation: fade .35s ease-out; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .app { min-height: 100vh; display: flex; flex-direction: column; }
+  .main { flex: 1; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+  .container-narrow { max-width: 768px; margin: 0 auto; padding: 48px 24px; }
+
+  /* Nav */
+  .nav { background: #0f172a; color: white; border-bottom: 1px solid #1e293b; }
+  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-brand { display: flex; align-items: center; gap: 12px; }
+  .nav-logo { width: 32px; height: 32px; border-radius: 8px; background: #10b981; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; }
+  .nav-logo svg { width: 20px; height: 20px; }
+  .nav-name { font-weight: 700; font-size: 14px; letter-spacing: -0.01em; }
+  .nav-tagline { font-size: 12px; color: #94a3b8; margin-top: -2px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; font-size: 14px; }
+  .nav-back { display: inline-flex; align-items: center; gap: 6px; color: #cbd5e1; transition: color .2s; }
+  .nav-back:hover { color: white; }
+  .nav-back svg { width: 16px; height: 16px; }
+  .nav-org { color: #94a3b8; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: #334155; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+
+  /* Footer */
+  .footer { border-top: 1px solid #e2e8f0; background: white; padding: 16px 0; margin-top: 48px; }
+  .footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #64748b; gap: 16px; flex-wrap: wrap; }
+
+  /* Page header */
+  .page-header { margin-bottom: 24px; }
+  .page-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 600; }
+  .page-title { font-size: 30px; margin: 4px 0 0; }
+  .page-title.sm { font-size: 24px; }
+  .page-sub { color: #475569; margin-top: 4px; font-size: 14px; }
+
+  /* ESG banner */
+  .esg-banner { border-radius: 16px; background: linear-gradient(135deg, #059669, #047857); color: white; padding: 24px; display: flex; justify-content: space-between; align-items: center; gap: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 24px; flex-wrap: wrap; }
+  .esg-banner-text { flex: 1; min-width: 280px; }
+  .esg-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; color: #d1fae5; }
+  .esg-tag svg { width: 14px; height: 14px; }
+  .esg-headline { font-size: 22px; font-weight: 700; margin-top: 6px; line-height: 1.3; }
+  .esg-sub { color: #d1fae5; font-size: 14px; margin-top: 6px; }
+  .esg-cta { flex-shrink: 0; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; transition: background .2s; }
+  .esg-cta:hover { background: rgba(255,255,255,0.25); }
+
+  /* Metrics row */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 768px) { .metrics { grid-template-columns: repeat(2, 1fr); } }
+  .metric { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+  .metric-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 600; }
+  .metric-value { font-size: 24px; font-weight: 700; margin-top: 8px; }
+  .metric-value.positive { color: #047857; }
+  .metric-sub { font-size: 12px; color: #64748b; margin-top: 4px; }
+
+  /* Card */
+  .card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); overflow: hidden; }
+
+  /* Pour ledger */
+  .ledger-header { padding: 16px 24px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .ledger-title { font-weight: 600; }
+  .ledger-sub { font-size: 12px; color: #64748b; margin-top: 2px; }
+  .ledger-badges { display: flex; gap: 8px; font-size: 12px; }
+  .badge { padding: 4px 10px; border-radius: 999px; font-weight: 500; }
+  .badge-verified { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+  .badge-exception { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+
+  .ledger-table { font-size: 14px; }
+  .ledger-table thead { background: #f8fafc; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; }
+  .ledger-table th { padding: 12px 24px; text-align: left; font-weight: 600; }
+  .ledger-table th.r { text-align: right; }
+  .ledger-table tbody tr { border-top: 1px solid #f1f5f9; cursor: pointer; transition: background .15s; }
+  .ledger-table tbody tr:hover { background: #f8fafc; }
+  .ledger-table tbody tr.flagged { background: rgba(254, 243, 199, 0.4); }
+  .ledger-table td { padding: 12px 24px; white-space: nowrap; }
+  .ledger-table td.r { text-align: right; }
+  .ledger-table td.id { font-weight: 600; }
+  .ledger-table td.muted { color: #475569; }
+  .ledger-table td.view { text-align: right; color: #94a3b8; font-size: 12px; }
+
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .pill-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .pill-verified { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+  .pill-verified .pill-dot { background: #10b981; }
+  .pill-exception { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+  .pill-exception .pill-dot { background: #f59e0b; }
+
+  .helper-text { font-size: 12px; color: #64748b; text-align: center; margin-top: 16px; }
+
+  /* Detail */
+  .detail-eyebrow { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .exception-tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #b45309; font-weight: 600; background: #fef3c7; padding: 2px 8px; border-radius: 4px; }
+  .pour-id { font-size: 12px; color: #64748b; }
+
+  .resolution-card { border: 1px solid #a7f3d0; background: linear-gradient(135deg, #ecfdf5, white); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+  .resolution-inner { display: flex; gap: 16px; align-items: flex-start; }
+  .resolution-icon { width: 48px; height: 48px; border-radius: 50%; background: #d1fae5; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .resolution-icon svg { width: 24px; height: 24px; color: #059669; }
+  .resolution-title { font-weight: 600; color: #064e3b; }
+  .resolution-body { color: #334155; font-size: 14px; margin: 4px 0 0; line-height: 1.6; }
+  .resolution-cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 16px; background: #0f172a; color: white; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; transition: background .2s; }
+  .resolution-cta:hover { background: #1e293b; }
+  .resolution-cta svg { width: 16px; height: 16px; }
+
+  /* Timeline */
+  .timeline-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 24px; }
+  .section-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 600; margin-bottom: 16px; }
+  .section-eyebrow.dim { color: #94a3b8; margin-bottom: 4px; }
+  .timeline { display: flex; flex-direction: column; gap: 12px; }
+  .timeline-row { display: flex; gap: 16px; }
+  .timeline-time { flex-shrink: 0; width: 112px; font-size: 12px; color: #64748b; font-variant-numeric: tabular-nums; padding-top: 2px; white-space: nowrap; }
+  .timeline-dot { flex-shrink: 0; margin-top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #10b981; }
+  .timeline-dot.flagged { background: #f59e0b; box-shadow: 0 0 0 4px #fef3c7; }
+  .timeline-content { flex: 1; }
+  .timeline-label { font-size: 14px; font-weight: 500; color: #0f172a; }
+  .timeline-label.flagged { color: #78350f; }
+  .timeline-sub { font-size: 12px; color: #64748b; margin-top: 2px; }
+
+  /* Evidence grid */
+  .evidence-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 24px; }
+  @media (max-width: 900px) { .evidence-grid { grid-template-columns: 1fr; } }
+  .evidence { background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+  .evidence-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; }
+  .evidence-icon { width: 36px; height: 36px; border-radius: 8px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; color: #334155; flex-shrink: 0; }
+  .evidence-icon svg { width: 20px; height: 20px; }
+  .evidence-icon.warn { color: #b45309; }
+  .evidence-title { font-weight: 600; font-size: 14px; }
+  .evidence-badge { font-size: 12px; color: #64748b; margin-top: 2px; }
+
+  .kv { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; border-bottom: 1px solid #f1f5f9; gap: 12px; }
+  .kv:last-child { border-bottom: none; }
+  .kv-key { color: #64748b; flex-shrink: 0; }
+  .kv-val { color: #0f172a; font-weight: 500; text-align: right; }
+  .kv-val.mono { font-variant-numeric: tabular-nums; }
+
+  .callout { border-radius: 8px; background: #fffbeb; border: 1px solid #fde68a; padding: 8px 12px; margin-bottom: 12px; font-size: 12px; color: #78350f; line-height: 1.5; }
+
+  .strength-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .strength-cell { background: #f8fafc; padding: 12px; border-radius: 8px; }
+  .strength-cell.pass { background: #ecfdf5; border: 1px solid #a7f3d0; }
+  .strength-cell-label { font-size: 12px; font-weight: 500; color: #64748b; }
+  .strength-cell.pass .strength-cell-label { color: #047857; font-weight: 600; }
+  .strength-cell-value { font-size: 20px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .strength-cell.pass .strength-cell-value { color: #047857; }
+  .strength-cell-unit { font-size: 14px; font-weight: 500; color: #64748b; }
+  .strength-cell.pass .strength-cell-unit { color: #059669; }
+  .strength-cell-extra { font-size: 12px; color: #047857; margin-top: 2px; }
+
+  .cure-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .cure-cell { background: #f8fafc; padding: 8px; border-radius: 4px; }
+  .cure-cell.success { background: #ecfdf5; }
+  .cure-cell-label { font-size: 12px; color: #64748b; }
+  .cure-cell.success .cure-cell-label { color: #047857; }
+  .cure-cell-value { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .cure-cell.success .cure-cell-value { color: #047857; }
+
+  .carbon-bars { display: flex; flex-direction: column; gap: 8px; }
+  .carbon-bar { font-size: 12px; }
+  .carbon-bar-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .carbon-bar-label { color: #475569; font-weight: 500; }
+  .carbon-bar-val { font-variant-numeric: tabular-nums; color: #334155; }
+  .carbon-bar-track { height: 8px; border-radius: 999px; background: #f1f5f9; overflow: hidden; }
+  .carbon-bar-fill { height: 100%; border-radius: 999px; }
+  .carbon-bar-fill.opc { background: #94a3b8; }
+  .carbon-bar-fill.epd { background: #fbbf24; }
+  .carbon-bar-fill.actual { background: #10b981; }
+
+  /* Audit chain */
+  .audit-card { background: #0f172a; color: #cbd5e1; border-radius: 16px; padding: 24px; }
+  .audit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 12px; }
+  .audit-title { font-weight: 600; color: white; }
+  .audit-tag { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); font-weight: 500; }
+  .audit-hash { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12px; color: #94a3b8; word-break: break-all; background: rgba(2, 6, 23, 0.6); border: 1px solid #1e293b; border-radius: 8px; padding: 12px; }
+  .audit-hash strong { color: #6ee7b7; font-weight: 400; }
+  .audit-note { font-size: 12px; color: #94a3b8; margin-top: 12px; line-height: 1.6; }
+
+  /* Passport */
+  .passport { background: white; border: 1px solid #e2e8f0; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; }
+  .passport-header { background: #0f172a; color: white; padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .passport-id { text-align: right; font-size: 12px; color: #94a3b8; font-variant-numeric: tabular-nums; }
+  .passport-id .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; margin-top: 2px; word-break: break-all; max-width: 240px; }
+  .passport-hero { padding: 32px; text-align: center; border-bottom: 1px solid #f1f5f9; }
+  .passport-hero-tag { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 999px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+  .passport-hero-tag .pill-dot { background: #10b981; }
+  .passport-hero h1 { font-size: 28px; margin: 16px 0 0; }
+  .passport-hero p { color: #475569; max-width: 520px; margin: 8px auto 0; }
+
+  .passport-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #f1f5f9; }
+  .passport-grid > div { background: white; padding: 24px; }
+  .passport-grid-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 600; margin-bottom: 12px; }
+  .passport-grid-name { font-weight: 600; }
+  .passport-grid-sub { color: #475569; font-size: 14px; margin-top: 2px; }
+  .passport-grid-detail { font-size: 12px; color: #64748b; margin-top: 12px; }
+  .passport-grid-detail div { margin-top: 2px; }
+
+  .passport-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #f1f5f9; }
+  .passport-metric { background: white; padding: 20px; text-align: center; }
+  .passport-metric-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 600; }
+  .passport-metric-value { font-size: 20px; font-weight: 700; margin-top: 8px; font-variant-numeric: tabular-nums; }
+  .passport-metric-sub { font-size: 12px; color: #64748b; margin-top: 2px; }
+
+  .passport-exception { padding: 24px 32px; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; background: rgba(254, 243, 199, 0.4); }
+  .passport-exception-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #92400e; font-weight: 600; }
+  .passport-exception-text { font-size: 14px; color: #334155; margin-top: 8px; line-height: 1.6; }
+
+  .passport-verify { padding: 24px 32px; display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+  .qr-mock { width: 128px; height: 128px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 8px; flex-shrink: 0; }
+  .passport-verify-text { flex: 1; min-width: 0; }
+  .passport-verify-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; font-weight: 600; }
+  .passport-verify-url { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 14px; color: #334155; margin-top: 4px; word-break: break-all; }
+  .passport-verify-note { font-size: 12px; color: #64748b; margin-top: 8px; line-height: 1.6; }
+
+  .passport-footer { padding: 16px 32px; border-top: 1px solid #f1f5f9; background: #f8fafc; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .passport-footer-text { font-size: 12px; color: #64748b; }
+  .passport-actions { display: flex; gap: 8px; align-items: center; }
+  .btn-ghost { font-size: 14px; font-weight: 500; color: #334155; padding: 6px 12px; border-radius: 8px; border: 1px solid transparent; transition: all .2s; }
+  .btn-ghost:hover { background: white; border-color: #e2e8f0; color: #0f172a; }
+  .btn-primary { font-size: 14px; font-weight: 500; background: #0f172a; color: white; padding: 6px 14px; border-radius: 8px; transition: background .2s; }
+  .btn-primary:hover { background: #1e293b; }
+
+  @media (max-width: 600px) {
+    .nav-org { display: none; }
+    .passport-grid { grid-template-columns: 1fr; }
+    .passport-metrics { grid-template-columns: 1fr; }
+    .page-title { font-size: 24px; }
+    .esg-headline { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+"use strict";
+
+// ==================== DATA ====================
+
+var PROJECT = {
+  name: "Marina Bay Tower",
+  phase: "Foundation Mat — Block A",
+  developer: "Harborline Properties",
+  contractor: "Pacific Construction Group",
+  readyMix: "Coastal ReadyMix Co.",
+  startDate: "Apr 12, 2026",
+  endDate: "May 8, 2026",
+  totalPours: 24,
+  totalVolume: 1840,
+  epdId: "EPD-CRM-2025-0142",
+  epdCeiling: 260,
+  baselineOpc: 380,
+  actualAvg: 245,
+  carbonSavedTons: 64.4,
+  carbonSavedPctVsEpd: 12.5,
+  carbonSavedPctVsOpc: 35.5,
+  exceptionsResolved: 1,
+};
+
+var POURS = [
+  { id: 24, zone: "C-3", date: "May 8", volume: 78, status: "verified", carbon: 243, strength28: 34 },
+  { id: 23, zone: "C-2", date: "May 7", volume: 82, status: "verified", carbon: 241, strength28: 33 },
+  { id: 22, zone: "C-1", date: "May 6", volume: 75, status: "verified", carbon: 246, strength28: 33 },
+  { id: 21, zone: "B-4", date: "May 5", volume: 88, status: "verified", carbon: 244, strength28: 32 },
+  { id: 20, zone: "B-3", date: "May 5", volume: 85, status: "verified", carbon: 248, strength28: 33 },
+  { id: 19, zone: "B-2", date: "May 4", volume: 79, status: "verified", carbon: 245, strength28: 34 },
+  { id: 18, zone: "B-1", date: "May 4", volume: 81, status: "verified", carbon: 247, strength28: 33 },
+  { id: 17, zone: "A-4", date: "May 4", volume: 76, status: "verified", carbon: 244, strength28: 33 },
+  { id: 16, zone: "A-3", date: "May 3", volume: 80, status: "verified", carbon: 243, strength28: 34 },
+  { id: 15, zone: "A-2", date: "May 3", volume: 85, status: "verified", carbon: 245, strength28: 33 },
+  { id: 14, zone: "A-2", date: "May 3", volume: 85, status: "exception-resolved", carbon: 245, strength28: 33, flagged: true },
+  { id: 13, zone: "A-1", date: "May 2", volume: 78, status: "verified", carbon: 244, strength28: 32 },
+];
+
+var POUR_DETAIL = {
+  id: 14, zone: "A-2", date: "May 3, 2026", volume: 85,
+  batch: { ticketNo: "CRM-44218", truck: "#4421", mixCode: "GGBS-50-30", departed: "10:18", arrived: "10:42", placementStart: "10:51", placementEnd: "11:08", slumpAtArrival: 88, slumpSpec: "100 ± 20 mm", slumpAfterWater: 102 },
+  mix: { spec: "30 MPa @ 28 days", cementKg: 165, ggbsKg: 165, ggbsPct: 50, waterKg: 148, wcRatio: 0.45, aggregateKg: 1820, epdId: "EPD-CRM-2025-0142", epdCeiling: 260, declaredCarbon: 245 },
+  water: { amountL: 12, timestamp: "May 3, 2026 — 10:46", recordedBy: "Foreman J. Park (PCG-3142)", method: "Mobile field log", photoHash: "0x8f2a…c91d", slumpBefore: 88, slumpAfter: 102, revisedWcRatio: 0.456 },
+  cure: { sensorIds: ["TC-A2-01", "TC-A2-02", "TC-A2-03"], peakTemp: 38, peakHour: 18, maxAllowable: 45, maturityIndex: 1842, targetMaturity: 1500 },
+  strength: { spec: 30, day7: 24.1, day28: 33.2, cylinders: 6, lab: "Pacific Materials Lab", labReportId: "PML-2026-0584" },
+  carbon: { actual: 245, epdCeiling: 260, opcBaseline: 380, savingsVsEpd: 5.8, savingsVsOpc: 35.5, co2eForPour: 20.83 },
+  audit: { records: 24, rootHash: "0x7a9c4f12…e8b3", timestamp: "May 31, 2026 — 14:02 UTC" },
+};
+
+// ==================== STATE ====================
+
+var state = { view: "overview" };
+
+function pad3(n) { return String(n).padStart(3, "0"); }
+function pourCode(p) { return "POUR-MBT-" + pad3(p.id) + "-" + p.zone.replace("-", ""); }
+
+// ==================== ICONS ====================
+
+var ICON_SHIELD_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L4 7v6c0 4.5 3.5 8.5 8 9 4.5-.5 8-4.5 8-9V7l-8-5z"/><path d="M9 12l2 2 4-4"/></svg>';
+var ICON_BACK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>';
+var ICON_BADGE_CHECK = '<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>';
+var ICON_BIG_CHECK = '<svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>';
+var ICON_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>';
+var ICON_TICKET = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9h6"/></svg>';
+var ICON_FLASK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4h8l-1 9h-6L8 4z M9 13h6l1 7H8l1-7z"/></svg>';
+var ICON_DROP = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.2A4.5 4.5 0 0117.5 21H6.5A4.5 4.5 0 014 16.2c0-3.5 4-9.2 8-13.2 4 4 8 9.7 8 13.2z"/></svg>';
+var ICON_CHECK_CIRCLE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>';
+var ICON_CHART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h2l3 8 4-16 3 8h6"/></svg>';
+var ICON_DOWN_RIGHT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>';
+
+// ==================== TEMPLATES ====================
+
+function tplNav() {
+  return '' +
+    '<header class="nav"><div class="nav-inner">' +
+      '<div class="nav-brand">' +
+        '<div class="nav-logo">' + ICON_SHIELD_CHECK + '</div>' +
+        '<div><div class="nav-name">PourID</div><div class="nav-tagline">Field-verified concrete passports</div></div>' +
+      '</div>' +
+      '<div class="nav-right">' +
+        (state.view !== "overview"
+          ? '<button class="nav-back" data-action="go-back">' + ICON_BACK + 'Back</button>'
+          : "") +
+        '<div class="nav-org">Harborline Properties</div>' +
+        '<div class="avatar">HP</div>' +
+      '</div>' +
+    '</div></header>';
+}
+
+function tplFooter() {
+  return '' +
+    '<footer class="footer"><div class="footer-inner">' +
+      '<div>PourID · Field-verified concrete passports for EPD-compliant low-carbon projects</div>' +
+      '<div>Prototype v0.1 · 2026</div>' +
+    '</div></footer>';
+}
+
+function tplMetric(label, value, sub, positive) {
+  return '<div class="metric">' +
+    '<div class="metric-label">' + label + '</div>' +
+    '<div class="metric-value tabular' + (positive ? ' positive' : '') + '">' + value + '</div>' +
+    '<div class="metric-sub">' + sub + '</div>' +
+  '</div>';
+}
+
+function tplPill(status) {
+  if (status === "verified") {
+    return '<span class="pill pill-verified"><span class="pill-dot"></span>Verified</span>';
+  }
+  if (status === "exception-resolved") {
+    return '<span class="pill pill-exception"><span class="pill-dot"></span>Exception · Resolved</span>';
+  }
+  return "";
+}
+
+function kv(k, v, mono) {
+  return '<div class="kv"><span class="kv-key">' + k + '</span>' +
+    '<span class="kv-val' + (mono ? ' mono' : '') + '">' + v + '</span></div>';
+}
+
+// ==================== OVERVIEW ====================
+
+function tplOverview() {
+  var rows = POURS.map(function (p) {
+    return '<tr class="' + (p.flagged ? 'flagged' : '') + '" data-action="select-pour" data-pour-id="' + p.id + '">' +
+      '<td class="id tabular">#' + pad3(p.id) + '</td>' +
+      '<td class="tabular">' + p.zone + '</td>' +
+      '<td class="muted">' + p.date + '</td>' +
+      '<td class="r tabular">' + p.volume + ' m³</td>' +
+      '<td class="r tabular">' + p.carbon + ' kgCO₂e/m³</td>' +
+      '<td class="r tabular">' + p.strength28 + ' MPa</td>' +
+      '<td>' + tplPill(p.status) + '</td>' +
+      '<td class="view">View →</td>' +
+    '</tr>';
+  }).join("");
+
+  return '<div class="container anim-fade">' +
+    '<div class="page-header">' +
+      '<div class="page-eyebrow">Active project</div>' +
+      '<h1 class="page-title">' + PROJECT.name + '</h1>' +
+      '<div class="page-sub">' + PROJECT.phase + ' · ' + PROJECT.startDate + ' – ' + PROJECT.endDate + '</div>' +
+    '</div>' +
+
+    '<div class="esg-banner">' +
+      '<div class="esg-banner-text">' +
+        '<div class="esg-tag">' + ICON_BADGE_CHECK + 'ESG DISCLOSURE READY</div>' +
+        '<div class="esg-headline">All low-carbon claims for this project are field-verified against EPD ' + PROJECT.epdId + '.</div>' +
+        '<div class="esg-sub">Audit-grade evidence chain available for green-bond reporting and SEC climate disclosure.</div>' +
+      '</div>' +
+      '<button class="esg-cta">Export disclosure pack</button>' +
+    '</div>' +
+
+    '<div class="metrics">' +
+      tplMetric("EPD Compliance", "100%", PROJECT.totalPours + " of " + PROJECT.totalPours + " pours", true) +
+      tplMetric("Carbon Saved", PROJECT.carbonSavedTons + " tCO₂e", PROJECT.carbonSavedPctVsEpd + "% below EPD baseline", true) +
+      tplMetric("vs. OPC Baseline", "−" + PROJECT.carbonSavedPctVsOpc + "%", PROJECT.actualAvg + " kgCO₂e/m³ avg", true) +
+      tplMetric("Exceptions", PROJECT.exceptionsResolved + " resolved", "0 unresolved · all evidence-backed", false) +
+    '</div>' +
+
+    '<div class="card">' +
+      '<div class="ledger-header">' +
+        '<div>' +
+          '<div class="ledger-title">Pour Ledger</div>' +
+          '<div class="ledger-sub">' + PROJECT.totalPours + ' pours · ' + PROJECT.totalVolume + ' m³ · contractor ' + PROJECT.contractor + '</div>' +
+        '</div>' +
+        '<div class="ledger-badges">' +
+          '<span class="badge badge-verified">23 Verified</span>' +
+          '<span class="badge badge-exception">1 Exception Resolved</span>' +
+        '</div>' +
+      '</div>' +
+      '<div style="overflow-x: auto;">' +
+        '<table class="ledger-table"><thead><tr>' +
+          '<th>Pour</th><th>Zone</th><th>Date</th>' +
+          '<th class="r">Volume</th><th class="r">Carbon</th><th class="r">28-day</th>' +
+          '<th>Status</th><th></th>' +
+        '</tr></thead><tbody>' + rows + '</tbody></table>' +
+      '</div>' +
+    '</div>' +
+
+    '<div class="helper-text">Click any row to inspect its evidence chain. The amber-flagged pour shows how a field exception is captured and resolved.</div>' +
+  '</div>';
+}
+
+// ==================== DETAIL ====================
+
+function tplDetail() {
+  var p = POUR_DETAIL;
+  return '<div class="container anim-fade">' +
+    '<div class="page-header">' +
+      '<div class="detail-eyebrow">' +
+        '<span class="exception-tag">Exception · Resolved</span>' +
+        '<span class="pour-id tabular">Pour ID: ' + pourCode(p) + '</span>' +
+      '</div>' +
+      '<h1 class="page-title sm" style="margin-top: 8px;">Pour #' + pad3(p.id) + ' · Zone ' + p.zone + '</h1>' +
+      '<div class="page-sub">' + p.date + ' · ' + p.volume + ' m³ · ' + PROJECT.readyMix + '</div>' +
+    '</div>' +
+
+    '<div class="resolution-card"><div class="resolution-inner">' +
+      '<div class="resolution-icon">' + ICON_BIG_CHECK + '</div>' +
+      '<div style="flex: 1;">' +
+        '<div class="resolution-title">Field exception captured. All EPD criteria met.</div>' +
+        '<p class="resolution-body">Water (+12 L, ~1.2% by mass) was added on site after slump fell below spec. Cure-temperature, maturity index, and 28-day cylinder tests confirm the design strength target was met. Recalculated carbon (245 kgCO₂e/m³) remains under the EPD ceiling of 260 kgCO₂e/m³. Full evidence chain hashed and audit-ready below.</p>' +
+        '<button class="resolution-cta" data-action="go-passport">Generate Pour Passport ' + ICON_ARROW + '</button>' +
+      '</div>' +
+    '</div></div>' +
+
+    tplTimeline() +
+
+    '<div class="evidence-grid">' +
+      tplBatchTicket() +
+      tplMixDesign() +
+      tplWaterAddition() +
+      tplStrength() +
+      tplCure() +
+      tplCarbon() +
+    '</div>' +
+
+    tplAuditChain() +
+  '</div>';
+}
+
+function tplTimeline() {
+  var events = [
+    { time: "10:18", label: "Truck #4421 dispatched", sub: "Coastal ReadyMix Co. · Mix GGBS-50-30" },
+    { time: "10:42", label: "Arrival on site", sub: "Slump test: 88 mm (spec 100 ± 20 mm)" },
+    { time: "10:46", label: "Water added on site: +12 L", sub: "Recorded by Foreman J. Park · slump → 102 mm", flagged: true },
+    { time: "10:51", label: "Placement begins · Zone A-2", sub: "85 m³ over 17 minutes" },
+    { time: "11:08", label: "Placement complete", sub: "Cylinders cast for 7-day and 28-day" },
+    { time: "May 3 onward", label: "Cure-temperature monitoring", sub: "3 sensors · peak 38°C @ 18h" },
+    { time: "May 31", label: "28-day strength: 33.2 MPa", sub: "Spec 30 MPa · Pacific Materials Lab" },
+  ];
+  var rows = events.map(function (e) {
+    var flag = e.flagged ? " flagged" : "";
+    return '<div class="timeline-row">' +
+      '<div class="timeline-time">' + e.time + '</div>' +
+      '<div class="timeline-dot' + flag + '"></div>' +
+      '<div class="timeline-content">' +
+        '<div class="timeline-label' + flag + '">' + e.label + '</div>' +
+        '<div class="timeline-sub">' + e.sub + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+  return '<div class="timeline-card">' +
+    '<div class="section-eyebrow">Field Timeline</div>' +
+    '<div class="timeline">' + rows + '</div>' +
+  '</div>';
+}
+
+function tplEvidence(opts) {
+  return '<div class="evidence">' +
+    '<div class="evidence-header">' +
+      '<div class="evidence-icon' + (opts.iconClass ? ' ' + opts.iconClass : '') + '">' + opts.icon + '</div>' +
+      '<div>' +
+        '<div class="evidence-title">' + opts.title + '</div>' +
+        (opts.badge ? '<div class="evidence-badge">' + opts.badge + '</div>' : '') +
+      '</div>' +
+    '</div>' +
+    opts.body +
+  '</div>';
+}
+
+function tplBatchTicket() {
+  var b = POUR_DETAIL.batch;
+  return tplEvidence({
+    icon: ICON_TICKET, title: "Batch Ticket",
+    badge: "OCR-extracted from delivery slip · verified",
+    body:
+      kv("Ticket #", b.ticketNo, true) +
+      kv("Truck", b.truck, true) +
+      kv("Mix code", b.mixCode, true) +
+      kv("Departed plant", b.departed, true) +
+      kv("Arrived on site", b.arrived, true) +
+      kv("Slump on arrival", b.slumpAtArrival + " mm", true) +
+      kv("Slump spec", b.slumpSpec, false),
+  });
+}
+
+function tplMixDesign() {
+  var m = POUR_DETAIL.mix;
+  return tplEvidence({
+    icon: ICON_FLASK, title: "Mix Design · GGBS-50-30",
+    badge: "EPD " + m.epdId + " · ceiling " + m.epdCeiling + " kgCO₂e/m³",
+    body:
+      kv("Spec strength", m.spec, false) +
+      kv("Cement (Type I/II)", m.cementKg + " kg/m³", true) +
+      kv("GGBS replacement", m.ggbsKg + " kg/m³ (" + m.ggbsPct + "%)", true) +
+      kv("Water", m.waterKg + " kg/m³", true) +
+      kv("W/C ratio", m.wcRatio.toFixed(2), true) +
+      kv("Aggregate", m.aggregateKg + " kg/m³", true) +
+      kv("Declared carbon", m.declaredCarbon + " kgCO₂e/m³", true),
+  });
+}
+
+function tplWaterAddition() {
+  var w = POUR_DETAIL.water;
+  return tplEvidence({
+    icon: ICON_DROP, iconClass: "warn",
+    title: "Water Addition · Field Log",
+    badge: "Trigger event for this exception",
+    body:
+      '<div class="callout">Slump on arrival was 88 mm (12 mm under target). Driver requested water add to restore workability before placement.</div>' +
+      kv("Amount added", w.amountL + " L (~1.2% mass)", true) +
+      kv("Recorded at", w.timestamp, true) +
+      kv("Recorded by", w.recordedBy, false) +
+      kv("Method", w.method, false) +
+      kv("Photo evidence", w.photoHash, true) +
+      kv("Slump after add", w.slumpAfter + " mm (in spec)", true) +
+      kv("Revised W/C", w.revisedWcRatio.toFixed(3), true),
+  });
+}
+
+function tplStrength() {
+  var s = POUR_DETAIL.strength;
+  var overSpec = ((s.day28 - s.spec) / s.spec * 100).toFixed(1);
+  return tplEvidence({
+    icon: ICON_CHECK_CIRCLE, title: "Compressive Strength",
+    badge: s.lab + " · Report " + s.labReportId,
+    body:
+      '<div class="strength-grid">' +
+        '<div class="strength-cell">' +
+          '<div class="strength-cell-label">7-day</div>' +
+          '<div class="strength-cell-value">' + s.day7 + ' <span class="strength-cell-unit">MPa</span></div>' +
+        '</div>' +
+        '<div class="strength-cell pass">' +
+          '<div class="strength-cell-label">28-day · PASS</div>' +
+          '<div class="strength-cell-value">' + s.day28 + ' <span class="strength-cell-unit">MPa</span></div>' +
+          '<div class="strength-cell-extra">+' + overSpec + '% over spec</div>' +
+        '</div>' +
+      '</div>' +
+      kv("Spec target", s.spec + " MPa @ 28d", true) +
+      kv("Cylinders cast", s.cylinders + " (3 × 7d, 3 × 28d)", true),
+  });
+}
+
+function tplCure() {
+  var c = POUR_DETAIL.cure;
+  return tplEvidence({
+    icon: ICON_CHART, title: "Cure Temperature",
+    badge: c.sensorIds.length + " embedded sensors · 72-hour window",
+    body:
+      tplCureChart() +
+      '<div class="cure-grid">' +
+        '<div class="cure-cell"><div class="cure-cell-label">Peak</div><div class="cure-cell-value">' + c.peakTemp + '°C @ ' + c.peakHour + 'h</div></div>' +
+        '<div class="cure-cell"><div class="cure-cell-label">Max allowed</div><div class="cure-cell-value">' + c.maxAllowable + '°C</div></div>' +
+        '<div class="cure-cell success"><div class="cure-cell-label">Maturity</div><div class="cure-cell-value">' + c.maturityIndex + ' °C·h</div></div>' +
+      '</div>',
+  });
+}
+
+function tplCureChart() {
+  var data = [[0,20],[3,24],[6,28],[9,32],[12,35],[15,37],[18,38],[24,36],[30,33],[36,31],[48,27],[60,24],[72,22]];
+  var W = 600, H = 180, PL = 36, PR = 12, PT = 16, PB = 24;
+  function xS(h) { return PL + (h / 72) * (W - PL - PR); }
+  function yS(t) { return H - PB - (t / 50) * (H - PT - PB); }
+  var linePts = data.map(function (d) { return xS(d[0]) + "," + yS(d[1]); }).join(" ");
+  var areaPath = "M " + xS(0) + "," + yS(0) + " " +
+    data.map(function (d) { return "L " + xS(d[0]) + "," + yS(d[1]); }).join(" ") +
+    " L " + xS(72) + "," + yS(0) + " Z";
+  var yLines = [10, 20, 30, 40, 50].map(function (t) {
+    return '<line x1="' + PL + '" y1="' + yS(t) + '" x2="' + (W - PR) + '" y2="' + yS(t) + '" stroke="#e2e8f0" stroke-dasharray="2 2"/>' +
+      '<text x="' + (PL - 6) + '" y="' + (yS(t) + 3) + '" font-size="9" fill="#94a3b8" text-anchor="end">' + t + '°C</text>';
+  }).join("");
+  var xTicks = [0, 12, 24, 36, 48, 60, 72].map(function (t) {
+    return '<text x="' + xS(t) + '" y="' + (H - PB + 14) + '" font-size="9" fill="#94a3b8" text-anchor="middle">' + t + 'h</text>';
+  }).join("");
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width: 100%; display: block;">' +
+    '<defs><linearGradient id="cureGrad" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0%" stop-color="#10b981" stop-opacity="0.25"/>' +
+      '<stop offset="100%" stop-color="#10b981" stop-opacity="0"/>' +
+    '</linearGradient></defs>' +
+    yLines + xTicks +
+    '<line x1="' + PL + '" y1="' + yS(45) + '" x2="' + (W - PR) + '" y2="' + yS(45) + '" stroke="#f59e0b" stroke-dasharray="3 3" stroke-width="1.5"/>' +
+    '<text x="' + (W - PR - 4) + '" y="' + (yS(45) - 3) + '" font-size="9" fill="#b45309" text-anchor="end">Max 45°C</text>' +
+    '<path d="' + areaPath + '" fill="url(#cureGrad)"/>' +
+    '<polyline points="' + linePts + '" fill="none" stroke="#10b981" stroke-width="2" stroke-linejoin="round"/>' +
+    '<circle cx="' + xS(18) + '" cy="' + yS(38) + '" r="4" fill="#10b981" stroke="white" stroke-width="2"/>' +
+    '<text x="' + xS(18) + '" y="' + (yS(38) - 8) + '" font-size="10" fill="#065f46" text-anchor="middle" font-weight="600">Peak 38°C</text>' +
+  '</svg>';
+}
+
+function tplCarbon() {
+  var c = POUR_DETAIL.carbon;
+  return tplEvidence({
+    icon: ICON_DOWN_RIGHT, title: "Carbon Calculation",
+    badge: "ISO 21930 · GWP 100-year",
+    body:
+      tplCarbonBars() +
+      '<div style="margin-top: 16px;">' +
+        kv("OPC baseline (Type I)", c.opcBaseline + " kgCO₂e/m³", true) +
+        kv("EPD ceiling", c.epdCeiling + " kgCO₂e/m³", true) +
+        kv("Actual (this pour)", c.actual + " kgCO₂e/m³", true) +
+        kv("Savings vs. EPD", c.savingsVsEpd + "% under ceiling", false) +
+        kv("Savings vs. OPC", c.savingsVsOpc + "% reduction", false) +
+        kv("Total CO₂e for pour", c.co2eForPour + " tCO₂e", true) +
+      '</div>',
+  });
+}
+
+function tplCarbonBars() {
+  var max = 400;
+  var items = [
+    { label: "OPC baseline", v: 380, cls: "opc" },
+    { label: "EPD ceiling", v: 260, cls: "epd" },
+    { label: "Actual", v: 245, cls: "actual" },
+  ];
+  var bars = items.map(function (it) {
+    return '<div class="carbon-bar">' +
+      '<div class="carbon-bar-row">' +
+        '<span class="carbon-bar-label">' + it.label + '</span>' +
+        '<span class="carbon-bar-val">' + it.v + ' kgCO₂e/m³</span>' +
+      '</div>' +
+      '<div class="carbon-bar-track">' +
+        '<div class="carbon-bar-fill ' + it.cls + '" style="width: ' + (it.v / max * 100) + '%;"></div>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+  return '<div class="carbon-bars">' + bars + '</div>';
+}
+
+function tplAuditChain() {
+  var a = POUR_DETAIL.audit;
+  return '<div class="audit-card">' +
+    '<div class="audit-header">' +
+      '<div>' +
+        '<div class="section-eyebrow dim">Audit chain</div>' +
+        '<div class="audit-title">' + a.records + ' immutable records · sealed ' + a.timestamp + '</div>' +
+      '</div>' +
+      '<span class="audit-tag">VERIFIED</span>' +
+    '</div>' +
+    '<div class="audit-hash">Root hash: <strong>' + a.rootHash + '</strong></div>' +
+    '<div class="audit-note">Each record (batch ticket OCR, sensor reading, water-log entry, lab report) is hashed and chained. Verification reproduces the root hash on demand for any auditor or regulator.</div>' +
+  '</div>';
+}
+
+// ==================== PASSPORT ====================
+
+function tplPassport() {
+  var p = POUR_DETAIL;
+  return '<div class="container-narrow anim-fade">' +
+    '<div class="passport">' +
+      '<div class="passport-header">' +
+        '<div class="nav-brand">' +
+          '<div class="nav-logo">' + ICON_SHIELD_CHECK + '</div>' +
+          '<div><div class="nav-name">PourID</div><div class="nav-tagline">Verified Pour Passport</div></div>' +
+        '</div>' +
+        '<div class="passport-id">' +
+          '<div>' + pourCode(p) + '</div>' +
+          '<div class="mono">' + p.audit.rootHash + '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="passport-hero">' +
+        '<div class="passport-hero-tag"><span class="pill-dot"></span>Field-verified · audit-grade</div>' +
+        '<h1>EPD Compliance Confirmed</h1>' +
+        '<p>This pour was placed and cured in accordance with EPD ' + p.mix.epdId + '. Field exception logged, evidence chain complete, all criteria met.</p>' +
+      '</div>' +
+
+      '<div class="passport-grid">' +
+        '<div>' +
+          '<div class="passport-grid-label">Project</div>' +
+          '<div class="passport-grid-name">' + PROJECT.name + '</div>' +
+          '<div class="passport-grid-sub">' + PROJECT.phase + '</div>' +
+          '<div class="passport-grid-detail">' +
+            '<div>Owner · ' + PROJECT.developer + '</div>' +
+            '<div>Contractor · ' + PROJECT.contractor + '</div>' +
+            '<div>Supplier · ' + PROJECT.readyMix + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div>' +
+          '<div class="passport-grid-label">Pour</div>' +
+          '<div class="passport-grid-name">Pour #' + pad3(p.id) + ' · Zone ' + p.zone + '</div>' +
+          '<div class="passport-grid-sub">' + p.date + '</div>' +
+          '<div class="passport-grid-detail">' +
+            '<div>Volume · ' + p.volume + ' m³</div>' +
+            '<div>Mix · ' + p.batch.mixCode + '</div>' +
+            '<div>Specified · ' + p.strength.spec + ' MPa @ 28d</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="passport-metrics">' +
+        '<div class="passport-metric">' +
+          '<div class="passport-metric-label">28-day Strength</div>' +
+          '<div class="passport-metric-value">33.2 MPa</div>' +
+          '<div class="passport-metric-sub">+10.7% over spec</div>' +
+        '</div>' +
+        '<div class="passport-metric">' +
+          '<div class="passport-metric-label">Carbon</div>' +
+          '<div class="passport-metric-value">245 kgCO₂e/m³</div>' +
+          '<div class="passport-metric-sub">EPD ceiling 260</div>' +
+        '</div>' +
+        '<div class="passport-metric">' +
+          '<div class="passport-metric-label">Cure Maturity</div>' +
+          '<div class="passport-metric-value">1842 °C·h</div>' +
+          '<div class="passport-metric-sub">target 1500</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="passport-exception">' +
+        '<div class="passport-exception-label">Field Exception · Resolved</div>' +
+        '<div class="passport-exception-text">Water (+12 L) added at 10:46 to restore slump from 88 mm to 102 mm. Recorded by Foreman J. Park. Revised W/C 0.456. 28-day cylinder tests confirmed strength target met; recalculated carbon stayed under EPD ceiling.</div>' +
+      '</div>' +
+
+      '<div class="passport-verify">' +
+        '<div class="qr-mock">' + tplQR("POUR-MBT-" + p.id + "-" + p.zone) + '</div>' +
+        '<div class="passport-verify-text">' +
+          '<div class="passport-verify-label">Verification</div>' +
+          '<div class="passport-verify-url">pourid.io/v/' + pourCode(p) + '</div>' +
+          '<div class="passport-verify-note">Scan or visit URL to retrieve the full evidence chain (' + p.audit.records + ' records). Sealed ' + p.audit.timestamp + '.</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="passport-footer">' +
+        '<div class="passport-footer-text">Issued by PourID · field data verified by independent third party</div>' +
+        '<div class="passport-actions">' +
+          '<button class="btn-ghost">Copy link</button>' +
+          '<button class="btn-ghost">Print</button>' +
+          '<button class="btn-primary">Download PDF</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function tplQR(seed) {
+  var size = 21;
+  var h = 0;
+  for (var i = 0; i < seed.length; i++) {
+    h = ((h * 31 + seed.charCodeAt(i)) >>> 0);
+  }
+  function rand() { h = (h * 1103515245 + 12345) >>> 0; return (h >>> 16) & 0xff; }
+  function isFinder(x, y) {
+    return (x < 7 && y < 7) || (x < 7 && y >= size - 7) || (x >= size - 7 && y < 7);
+  }
+  function finderOn(x, y) {
+    var lx = x, ly = y;
+    if (x >= size - 7) lx = x - (size - 7);
+    if (y >= size - 7) ly = y - (size - 7);
+    if (lx === 0 || lx === 6 || ly === 0 || ly === 6) return true;
+    if (lx >= 2 && lx <= 4 && ly >= 2 && ly <= 4) return true;
+    return false;
+  }
+  var cells = "";
+  for (var y = 0; y < size; y++) {
+    for (var x = 0; x < size; x++) {
+      var on = false;
+      if (isFinder(x, y)) on = finderOn(x, y);
+      else on = rand() > 128;
+      if (on) cells += '<rect x="' + x + '" y="' + y + '" width="1" height="1" fill="#0f172a"/>';
+    }
+  }
+  return '<svg viewBox="0 0 ' + size + ' ' + size + '" style="width: 100%; height: 100%; display: block;">' + cells + '</svg>';
+}
+
+// ==================== RENDER ====================
+
+function render() {
+  var root = document.getElementById("root");
+  root.className = "app";
+  var inner;
+  if (state.view === "overview") inner = tplOverview();
+  else if (state.view === "detail") inner = tplDetail();
+  else if (state.view === "passport") inner = tplPassport();
+  root.innerHTML = tplNav() + '<main class="main">' + inner + '</main>' + tplFooter();
+  window.scrollTo(0, 0);
+}
+
+document.addEventListener("click", function (e) {
+  var target = e.target.closest("[data-action]");
+  if (!target) return;
+  var action = target.getAttribute("data-action");
+  if (action === "select-pour") {
+    state.view = "detail";
+    render();
+  } else if (action === "go-passport") {
+    state.view = "passport";
+    render();
+  } else if (action === "go-back") {
+    if (state.view === "passport") state.view = "detail";
+    else if (state.view === "detail") state.view = "overview";
+    render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
